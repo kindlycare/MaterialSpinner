@@ -7,12 +7,15 @@
         <attr name="ms_error" format="string"/>
         <attr name="ms_hint" format="string"/>
         <attr name="ms_hintColor" format="color"/>
+        <attr name="ms_hintTextSize" format="dimension"/>
+        <attr name="ms_hintFontFamily" format="string"/>
         <attr name="ms_floatingLabelText" format="string"/>
         <attr name="ms_floatingLabelColor" format="color"/>
         <attr name="ms_multiline" format="boolean"/>
         <attr name="ms_nbErrorLines" format="integer"/>
         <attr name="ms_typeface" format="string"/>
         <attr name="ms_alignLabels" format="boolean"/>
+        <attr name="ms_trimPadding" format="boolean"/>
         <attr name="ms_thickness" format="dimension"/>
         <attr name="ms_thickness_error" format="dimension"/>
         <attr name="ms_arrowSize" format="dimension"/>

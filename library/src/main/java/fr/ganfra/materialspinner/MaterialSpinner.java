@@ -100,6 +100,9 @@ public class MaterialSpinner extends AppCompatSpinner implements ValueAnimator.A
     private boolean enableErrorLabel;
     private boolean enableFloatingLabel;
     private boolean isRtl;
+    protected int       hintTextSize;
+    protected String    hintFontFamily;
+    protected boolean   trimPadding;
 
     private HintAdapter hintAdapter;
 
@@ -174,10 +177,15 @@ public class MaterialSpinner extends AppCompatSpinner implements ValueAnimator.A
         enableErrorLabel = array.getBoolean(R.styleable.MaterialSpinner_ms_enableErrorLabel, true);
         enableFloatingLabel = array.getBoolean(R.styleable.MaterialSpinner_ms_enableFloatingLabel, true);
         isRtl = array.getBoolean(R.styleable.MaterialSpinner_ms_isRtl, false);
+        hintTextSize = (int)array.getDimension(R.styleable.MaterialSpinner_ms_hintTextSize, 0);
+        hintFontFamily = array.getString(R.styleable.MaterialSpinner_ms_hintFontFamily);
+        trimPadding = array.getBoolean(R.styleable.MaterialSpinner_ms_trimPadding, false);
 
         String typefacePath = array.getString(R.styleable.MaterialSpinner_ms_typeface);
         if (typefacePath != null) {
             typeface = Typeface.createFromAsset(getContext().getAssets(), typefacePath);
+        } else if(hintFontFamily != null) {
+            typeface = Typeface.create(hintFontFamily, Typeface.NORMAL);
         }
 
         array.recycle();
@@ -256,7 +264,10 @@ public class MaterialSpinner extends AppCompatSpinner implements ValueAnimator.A
         underlineBottomSpacing = getResources().getDimensionPixelSize(R.dimen.underline_bottom_spacing);
         floatingLabelTopSpacing = getResources().getDimensionPixelSize(R.dimen.floating_label_top_spacing);
         floatingLabelBottomSpacing = getResources().getDimensionPixelSize(R.dimen.floating_label_bottom_spacing);
-        rightLeftSpinnerPadding = alignLabels ? getResources().getDimensionPixelSize(R.dimen.right_left_spinner_padding) : 0;
+        rightLeftSpinnerPadding = alignLabels ? getResources().getDimensionPixelSize(R.dimen.right_left_spinner_padding) : 0;///
+        if(trimPadding) {
+            rightLeftSpinnerPadding = rightLeftSpinnerPadding / 2;
+        }
         floatingLabelInsideSpacing = getResources().getDimensionPixelSize(R.dimen.floating_label_inside_spacing);
         errorLabelSpacing = (int) getResources().getDimension(R.dimen.error_label_spacing);
         minContentHeight = (int) getResources().getDimension(R.dimen.min_content_height);
@@ -441,10 +452,10 @@ public class MaterialSpinner extends AppCompatSpinner implements ValueAnimator.A
             }
             String textToDraw = floatingLabelText != null ? floatingLabelText.toString() : hint.toString();
             if (isRtl) {
-				canvas.drawText(textToDraw, getWidth() - rightLeftSpinnerPadding - textPaint.measureText(textToDraw), startYFloatingLabel, textPaint);
-			} else {
-				canvas.drawText(textToDraw, startX + rightLeftSpinnerPadding, startYFloatingLabel, textPaint);
-			}
+                canvas.drawText(textToDraw, getWidth() - rightLeftSpinnerPadding - textPaint.measureText(textToDraw), startYFloatingLabel, textPaint);
+            } else {
+                canvas.drawText(textToDraw, startX + rightLeftSpinnerPadding, startYFloatingLabel, textPaint);
+            }
         }
 
         drawSelector(canvas, getWidth() - rightLeftSpinnerPadding, getPaddingTop() + dpToPx(8));
@@ -647,13 +658,13 @@ public class MaterialSpinner extends AppCompatSpinner implements ValueAnimator.A
     }
 
     public void setRtl() {
-		isRtl = true;
-		invalidate();
-	}
+        isRtl = true;
+        invalidate();
+    }
 
-	public boolean isRtl() {
-		return isRtl;
-	}
+    public boolean isRtl() {
+        return isRtl;
+    }
 
     /**
      * @deprecated {use @link #setPaddingSafe(int, int, int, int)} to keep internal computation OK
@@ -806,12 +817,26 @@ public class MaterialSpinner extends AppCompatSpinner implements ValueAnimator.A
         }
 
         private View getHintView(final View convertView, final ViewGroup parent, final boolean isDropDownView) {
-
             final LayoutInflater inflater = LayoutInflater.from(mContext);
             final int resid = isDropDownView ? android.R.layout.simple_spinner_dropdown_item : android.R.layout.simple_spinner_item;
             final TextView textView = (TextView) inflater.inflate(resid, parent, false);
             textView.setText(hint);
+
             textView.setTextColor(MaterialSpinner.this.isEnabled() ? hintColor : disabledColor);
+
+            if(hintTextSize > 0) {
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, hintTextSize);
+            }
+
+            if(!isDropDownView) {
+                if(null != typeface) {
+                    textView.setTypeface(typeface);
+                }
+
+                if(trimPadding) {
+                    textView.setPadding(textView.getPaddingLeft() / 2, textView.getPaddingTop(), textView.getPaddingRight(), textView.getPaddingBottom());
+                }
+            }
             textView.setTag(HINT_TYPE);
             return textView;
         }
